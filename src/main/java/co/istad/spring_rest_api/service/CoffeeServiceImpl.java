@@ -18,8 +18,23 @@ public class CoffeeServiceImpl implements CoffeeService{
     public List<CoffeeResponse> getCoffee() {
         List<Coffee> listCoffee = coffeeRepository.beanCoffee();
         return listCoffee.stream()
-                .map(coffee -> new CoffeeResponse(coffee.getName(),coffee.getDescription()))
+                .map(coffee -> new CoffeeResponse(coffee.getName(),coffee.getDescription(),coffee.getPrice()))
                 .toList();
-
     }
+
+   @Override
+    public CoffeeResponse getCoffeeById(Integer id){
+        return coffeeRepository.beanCoffee().stream().filter(c -> c.getId().equals(id))
+                .map(coffee -> new CoffeeResponse(coffee.getName(),coffee.getDescription(),coffee.getPrice()))
+                .findFirst()
+                .orElseThrow(()-> new RuntimeException("Error to get Coffee by Id!!!!!!!!"));
+   }
+
+   @Override
+    public List<CoffeeResponse> getCoffeeByName(String name){
+        return coffeeRepository.beanCoffee().stream()
+                .filter(coffee -> coffee.getName().toLowerCase().contains(name.toLowerCase().trim()))
+                .map(coffee -> new CoffeeResponse(coffee.getName(),coffee.getDescription(),coffee.getPrice()))
+                .toList();
+   }
 }
