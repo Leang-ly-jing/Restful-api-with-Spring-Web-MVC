@@ -9,5 +9,5 @@ public interface CoffeeService {
 
     CoffeeResponse getCoffeeById(Integer id);
 
-    List<CoffeeResponse> getCoffeeByName(String name);
+    List<CoffeeResponse> getCoffeeByNameOrPrice(String name, Double price);
 }

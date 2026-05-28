@@ -31,10 +31,12 @@ public class CoffeeServiceImpl implements CoffeeService{
    }
 
    @Override
-    public List<CoffeeResponse> getCoffeeByName(String name){
-        return coffeeRepository.beanCoffee().stream()
-                .filter(coffee -> coffee.getName().toLowerCase().contains(name.toLowerCase().trim()))
-                .map(coffee -> new CoffeeResponse(coffee.getName(),coffee.getDescription(),coffee.getPrice()))
-                .toList();
+    public List<CoffeeResponse> getCoffeeByNameOrPrice(String name,Double price){
+
+       return coffeeRepository.beanCoffee().stream()
+               .filter(c -> (name.isBlank() || c.getName().toLowerCase().contains(name.toLowerCase().trim())) && (price == null || c.getPrice() < price))
+               .map(coffee -> new CoffeeResponse(coffee.getName(),coffee.getDescription(),coffee.getPrice()))
+               .toList();
+
    }
 }

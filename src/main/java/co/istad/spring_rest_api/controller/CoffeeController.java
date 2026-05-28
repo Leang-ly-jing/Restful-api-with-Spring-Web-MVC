@@ -37,7 +37,7 @@ public class CoffeeController {
     ){
         log.info("GET search name: {}", name);
         log.info("GET search price: {}", price);
-        return coffeeService.getCoffeeByName(name);
+        return coffeeService.getCoffeeByNameOrPrice(name,price);
     }
 
 
