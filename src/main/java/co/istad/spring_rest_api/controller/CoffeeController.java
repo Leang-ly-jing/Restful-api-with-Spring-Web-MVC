@@ -2,8 +2,11 @@ package co.istad.spring_rest_api.controller;
 
 
 import co.istad.spring_rest_api.dto.CoffeeResponse;
+import co.istad.spring_rest_api.dto.CreateCoffeeRequest;
 import co.istad.spring_rest_api.service.CoffeeService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,6 +43,12 @@ public class CoffeeController {
         return coffeeService.getCoffeeByNameOrPrice(name,price);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping
+    public CoffeeResponse createCoffee(@Valid @RequestBody CreateCoffeeRequest createCoffeeRequest){
+        log.info("CREATE : {}", createCoffeeRequest);
+        return coffeeService.createCoffee(createCoffeeRequest);
+    }
 
 
 }
