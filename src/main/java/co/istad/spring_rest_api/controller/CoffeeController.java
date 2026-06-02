@@ -3,6 +3,7 @@ package co.istad.spring_rest_api.controller;
 
 import co.istad.spring_rest_api.dto.CoffeeResponse;
 import co.istad.spring_rest_api.dto.CreateCoffeeRequest;
+import co.istad.spring_rest_api.dto.UpdateCoffeeRequest;
 import co.istad.spring_rest_api.service.CoffeeService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -50,5 +51,17 @@ public class CoffeeController {
         return coffeeService.createCoffee(createCoffeeRequest);
     }
 
+    @PutMapping("/{id}")
+    public CoffeeResponse updateCoffeeById(
+            @PathVariable Integer id,
+            @Valid @RequestBody UpdateCoffeeRequest updateCoffeeRequest
+            ){
+        return coffeeService.updateCoffeeById(id,updateCoffeeRequest);
+    }
 
+    @DeleteMapping("/{id}")
+    public CoffeeResponse deleteCoffeeById(@PathVariable Integer id){
+        return coffeeService.deleteCoffeeById(id);
+
+    }
 }

@@ -3,8 +3,12 @@ package co.istad.spring_rest_api.service;
 import co.istad.spring_rest_api.domain.Coffee;
 import co.istad.spring_rest_api.dto.CoffeeResponse;
 import co.istad.spring_rest_api.dto.CreateCoffeeRequest;
+import co.istad.spring_rest_api.dto.UpdateCoffeeRequest;
 import co.istad.spring_rest_api.repository.CoffeeRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 import java.util.Random;
 
@@ -15,6 +19,42 @@ public class CoffeeServiceImpl implements CoffeeService{
 
     public CoffeeServiceImpl(CoffeeRepository coffeeRepository){
         this.coffeeRepository = coffeeRepository;
+    }
+
+    @Override
+    public CoffeeResponse deleteCoffeeById(Integer id) {
+        return coffeeRepository.getCoffees()
+                .stream()
+                .filter(coffee -> coffee.getId().equals(id))
+                .findFirst()
+                .map(coffee -> {
+                    coffeeRepository.getCoffees().remove(coffee);
+                    return new CoffeeResponse(coffee.getName(), coffee.getDescription(), coffee.getPrice());
+                })
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        String.format("Coffee id = %d not found", id)
+                ));
+    }
+
+
+
+    @Override
+    public CoffeeResponse updateCoffeeById(Integer id,UpdateCoffeeRequest updateCoffeeRequest) {
+
+        //validation coffee id not exist
+        return coffeeRepository.getCoffees()
+                .stream()
+                .filter(coffee -> coffee.getId().equals(id))
+                .findFirst()
+                .map(oldCoffee -> {
+                    oldCoffee.setName(updateCoffeeRequest.name());
+                    oldCoffee.setDescription(updateCoffeeRequest.description());
+                    oldCoffee.setPrice(updateCoffeeRequest.price());
+                    return oldCoffee;
+                })
+                .map(newCoffee ->new CoffeeResponse(newCoffee.getName(),newCoffee.getDescription(),newCoffee.getPrice()) )
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, String.format("Coffee with id %d not found",id)));
     }
 
     @Override

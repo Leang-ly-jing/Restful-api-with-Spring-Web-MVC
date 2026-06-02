@@ -1,11 +1,12 @@
 package co.istad.spring_rest_api.exception;
 
-import co.istad.spring_rest_api.dto.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -13,20 +14,42 @@ import java.util.*;
 @RestControllerAdvice
 public class AppException {
 
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<?> handleServiceException(ResponseStatusException e){
+        ErrorResponse<?> errorResponse= ErrorResponse.builder()
+                .status(false)
+                .code(e.getStatusCode().value())
+                .message("Service Exception error")
+                .errors(e.getReason())
+                .build();
+
+        return ResponseEntity.status(e.getStatusCode())
+                .body(errorResponse);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException e){
+    public ErrorResponse<?> handleValidationException(MethodArgumentNotValidException e){
 
         log.error("Validation Exception happened");
 
-        List<ErrorResponse> errorResponses = new ArrayList<>();
-        e.getFieldErrors().forEach(fieldError -> errorResponses.add (new ErrorResponse(fieldError.getField(),fieldError.getDefaultMessage())));
+        List<FieldErrorResponse> fieldErrorResponsesList = new ArrayList<>();
 
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("message", "Validation is Errored");
-        response.put("status", false);
-        response.put("code", e.getStatusCode().value());
-        response.put("errors" , errorResponses);
-        return ResponseEntity.badRequest().body(response);
+        e.getFieldErrors()
+                .forEach(fieldError -> {
+                    FieldErrorResponse fieldErrorResponse = FieldErrorResponse.builder()
+                            .field(fieldError.getField())
+                            .message(fieldError.getDefaultMessage())
+                            .build();
+
+                    fieldErrorResponsesList.add(fieldErrorResponse);
+                });
+
+       return ErrorResponse.builder()
+               .status(false)
+               .code(HttpStatus.BAD_REQUEST.value())
+               .message("Validation is Error")
+               .errors(fieldErrorResponsesList)
+               .build();
     }
 }
 
